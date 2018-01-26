@@ -1,0 +1,13 @@
+#! /bin/bash
+
+set -ex
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOCKER_TAG=$DOCKER_USER/$DOCKER_REPO:$CONTAINER
+
+docker run --net=host -v $(pwd):/develop \
+  -e COVERITY_SCAN_NOTIFICATION_EMAIL=$COVERITY_SCAN_NOTIFICATION_EMAIL \
+  -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN \
+  -it $DOCKER_TAG \
+  ci/$CONTAINER/$CONTAINER.sh
+

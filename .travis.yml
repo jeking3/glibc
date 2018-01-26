@@ -1,0 +1,57 @@
+#
+# glibc build on Travis CI (uses docker and travis build stages)
+# Copyright (C) 2018 James E. King III
+#
+# The "docker" build stage will build the docker images used in the
+# build process.  This procedure is smart enough not to rebuild the
+# docker image unless the Dockerfile has changed.
+#
+# Define the following environment variables in Travis CI in order
+# to generate and reuse existing docker containers:
+#
+# DOCKER_USER (your docker username)
+# DOCKER_PASS (your docker password)
+# DOCKER_REPO (the name of the repo in your account if not 'glibc')
+#
+# The "glibc" build stage builds glibc inside docker images.
+#
+# Define the following environment variables in Travis CI in order
+# to run a Coverity Scan build and send back the results:
+#
+# COVERITY_SCAN_NOTIFICATION_EMAIL
+# COVERITY_SCAN_TOKEN
+#
+
+sudo: required
+dist: trusty
+language: c
+
+services:
+  - docker
+
+branches:
+  only:
+    - master
+
+install:
+  - ci/install.sh
+
+script:
+  - ci/script.sh
+
+stages:
+  - glibc
+
+jobs:
+  include:
+    # ============================= stage: glibc =============================
+    - stage: glibc
+      env:
+        - CONTAINER=build
+    - env:
+        - CONTAINER=coverity
+
+notifications:
+  email:
+    false
+
